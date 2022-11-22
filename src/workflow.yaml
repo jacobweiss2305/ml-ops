@@ -1,0 +1,47 @@
+## Reminder: You can call nested dags!
+## The dependency graph may have multiple roots. The templates called from a DAG or steps template can themselves be DAG or steps templates.
+## This can allow for complex workflows to be split into manageable pieces.
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  generateName: phone-accuracy-
+spec:
+  entrypoint: entry
+  templates:
+  - name: entry
+    dag:
+      tasks:
+      - name: preprocess
+        template: preprocess
+      - name: train
+        dependencies: [preprocess]
+        template: train
+      - name: serve
+        dependencies: [preprocess, train]
+        template: serve
+      - name: monitor
+        dependencies: [preprocess, train]
+        template: monitor
+  # Docker Images
+  - name: preprocess
+    container:
+      image: us-central1-docker.pkg.dev/data-science-362714/data-science/phone-accuracy-preprocess:1.0
+  - name: train
+    container:
+      image: us-central1-docker.pkg.dev/data-science-362714/data-science/phone-accuracy-train:1.0
+  - name: serve
+    container:
+      image: us-central1-docker.pkg.dev/data-science-362714/data-science/phone-accuracy-serve:1.0
+      ports:
+      - containerPort: 8080
+      env:
+        - name: PORT
+          value: "8080"
+  - name: monitor
+    container:
+      image: us-central1-docker.pkg.dev/data-science-362714/data-science/phone-accuracy-monitor:1.0
+      ports:
+      - containerPort: 8089
+      env:
+        - name: PORT
+          value: "8089"

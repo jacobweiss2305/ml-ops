@@ -6,7 +6,6 @@ This repo also creates a VPC and subnet for the GKE cluster. This is not
 required but highly recommended to keep your GKE cluster isolated.
 
 ## GCP Infrastructure:
-- Add project/region to terraform.tfvars
 
 - Pull Terraform code
 
@@ -14,23 +13,16 @@ required but highly recommended to keep your GKE cluster isolated.
     cd gcp && bash pull.sh
     ```
 
+- Add project/region to terraform.tfvars
+
 - Provision resources
 
     ```
     cd learn-terraform-provision-gke-cluster && terraform init && terraform apply
     ```
+    Don't forget to Type yes!
 
-- Kubectl Plug-in
-
-    ```
-    gcloud components install gke-gcloud-auth-plugin
-    ```
-
-- Configure kubectl
-
-    ```
-    gcloud container clusters get-credentials $(terraform output -raw kubernetes_cluster_name) --region $(terraform output -raw region)
-    ```
+- [Add Kubectl Plug-in](https://cloud.google.com/blog/products/containers-kubernetes/kubectl-auth-changes-in-gke)
 
 - Deploy
 
@@ -79,7 +71,8 @@ required but highly recommended to keep your GKE cluster isolated.
     - Grab [latest release](https://github.com/argoproj/argo-workflows/releases) and edit the url below
 
     ```
-    kubectl apply -n argo -f https://github.com/argoproj/argo-workflows/releases/download/v<< ADD VERSION NUMBER HERE (i.e 3.4.3)>>/install.yaml ```
+    kubectl apply -n argo -f https://github.com/argoproj/argo-workflows/releases/download/v<< ADD VERSION NUMBER HERE (i.e 3.4.3)>>/install.yaml
+    ```
 
 - Patch argo-server auth
 
@@ -125,9 +118,34 @@ required but highly recommended to keep your GKE cluster isolated.
         ```
         argo get -n argo @latest
         ```
+## Adding Images to Artifact Registry
+
+- Create Docker Repo in GCP
+    ```
+    gcloud artifacts repositories create DOCKER_REPO_NAME --repository-format=docker \
+--location=us-central1 --description="Docker repository"
+    ```
+
+- Build and tag image
+    ```
+    docker build . -t us-central1-docker.pkg.dev/PROJECT/DOCKER_REPO_NAME/IMAGE_NAME:VERSION
+    ```
+- Push image to GCP
+    ```
+    docker push us-central1-docker.pkg.dev/PROJECT/DOCKER_REPO_NAME/IMAGE_NAME:VERSION
+    ```
 
 ## Clean-up
+
 - Destroy resources
     ```
     terraform destroy
+    ```
+
+## gcloud CLI
+
+- Create K8s cluster
+
+    ```
+    gcloud beta container --project "$PROJECT_ID" clusters create "cluster-1" --zone "us-central1-c" --no-enable-basic-auth --cluster-version "1.23.12-gke.100" --release-channel "regular" --machine-type "e2-medium" --image-type "COS_CONTAINERD" --disk-type "pd-standard" --disk-size "100" --metadata disable-legacy-endpoints=true --scopes "https://www.googleapis.com/auth/devstorage.read_only","https://www.googleapis.com/auth/logging.write","https://www.googleapis.com/auth/monitoring","https://www.googleapis.com/auth/servicecontrol","https://www.googleapis.com/auth/service.management.readonly","https://www.googleapis.com/auth/trace.append" --max-pods-per-node "110" --num-nodes "3" --logging=SYSTEM,WORKLOAD --monitoring=SYSTEM --enable-ip-alias --network "projects/$PROJECT_ID/global/networks/default" --subnetwork "projects/$PROJECT_ID/regions/us-central1/subnetworks/default" --no-enable-intra-node-visibility --default-max-pods-per-node "110" --no-enable-master-authorized-networks --addons HorizontalPodAutoscaling,HttpLoadBalancing,GcePersistentDiskCsiDriver --enable-autoupgrade --enable-autorepair --max-surge-upgrade 1 --max-unavailable-upgrade 0 --enable-shielded-nodes --node-locations "us-central1-c"
     ```
