@@ -1,10 +1,7 @@
-## Reminder: You can call nested dags!
-## The dependency graph may have multiple roots. The templates called from a DAG or steps template can themselves be DAG or steps templates.
-## This can allow for complex workflows to be split into manageable pieces.
 apiVersion: argoproj.io/v1alpha1
 kind: Workflow
 metadata:
-  generateName: phone-accuracy-
+  name: phone-accuracy
 spec:
   entrypoint: entry
   templates:

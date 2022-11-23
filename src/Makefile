@@ -20,4 +20,4 @@ push-version:
 	docker push us-central1-docker.pkg.dev/data-science-362714/data-science/phone-accuracy-preprocess:$(version) && \
 	docker push us-central1-docker.pkg.dev/data-science-362714/data-science/phone-accuracy-train:$(version) && \
 	docker push us-central1-docker.pkg.dev/data-science-362714/data-science/phone-accuracy-serve:$(version) && \
-	docker push us-central1-docker.pkg.dev/data-science-362714/data-science/phone-accuracy-monitor:1.0
+	docker push us-central1-docker.pkg.dev/data-science-362714/data-science/phone-accuracy-monitor:$(version)
