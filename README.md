@@ -1,7 +1,2 @@
-# ml-ops
-Container based MLOPS recipe
-
-## GCP IaC
-1. Provision Kubernetes cluster
-
-2. Provision Argo
+# Distributed Cloud Native ML
+An open-source recipe for running production ML workloads.
