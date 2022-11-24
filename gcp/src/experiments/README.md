@@ -78,6 +78,10 @@ image storage and *Cloud Run* for managed, serverless runtime environment.
         - Add SQL connection (Under Connections section)
         - Add service account (Under security section)
 
+## Set up Jupyterlab:
+- Make sure `kubectl` and `helm` are installed.
+- 
+
 ## How to track experiments:
 
 - Configure the following environment variables:
@@ -95,3 +99,4 @@ image storage and *Cloud Run* for managed, serverless runtime environment.
 ## Additional resources:
 
 - [Guide to deploying MLflow on GCP](https://console.cloud.google.com/run/create?project=data-science-362714)
+- [Zero to JupyterHub with K8s](https://z2jh.jupyter.org/en/stable/index.html)
