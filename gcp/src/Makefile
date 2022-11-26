@@ -5,10 +5,11 @@ SHELL = /bin/bash
 .PHONY: help
 help:
 	@echo "Commands:"
-	@echo "venv    : creates a virtual environment."
-	@echo "style   : executes style formatting."
-	@echo "clean   : cleans all unnecessary files."
-	@echo "test    : execute tests on code, data and models."
+	@echo "push-version version=1.X                  : push images to GCP."
+	@echo "mlflow-init                               : initializes mlflow repo."
+	@echo "jup-kill ns=namespace                     : kill jupyterhub container (requires ns=namespace)."
+	@echo "jup-start ns=namespace version=1.X        : spin up jupyterhub (requires version=version_number)."
+	@echo "jup-rebuild ns=namespace version=1.X      : kill and rebuild (requires ns=namespace version=version_number)."
 
 # AWS
 .PHONY:
@@ -25,3 +26,13 @@ push-version:
 .PHONY:
 mlflow-init:
 	cd experiments && git clone https://github.com/dlabsai/mlflow-for-gcp.git
+
+.PHONY:
+kill-ns:
+	kubectl delete namespace $(ns)
+
+.PHONY:
+jup-launch:
+	kubectl create namespace $(ns) --dry-run=client -o yaml | kubectl apply -f - && \
+	kubectl apply -f experiments/jupyter/deployment.yaml && \
+	kubectl get pods -n $(ns)
