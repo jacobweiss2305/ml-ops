@@ -1,14 +1,16 @@
-# Experiment tracking
+# Experiment tracking for Data Scientists
 
-This project uses MLflow to keep track of experiments.
+This project uses Jupyter to build models and MLflow to keep track of model experiments.
 
 ## Overview
 
-The deployment uses managed *Cloud SQL* database, *Cloud Storage* bucket for artifact storage,
+The MLflow deployment uses managed *Cloud SQL* database, *Cloud Storage* bucket for artifact storage,
 *Secret Manager* for obtaining secrets at run time, *Container Registry* for docker
 image storage and *Cloud Run* for managed, serverless runtime environment.
 
-## 7-Steps to deployment:
+Jupyterhub installation is easy. We will use a helm chart from this project: [Zero to JupyterHub with K8s](https://z2jh.jupyter.org/en/stable/index.html).
+
+## MLflow setup:
 
 1. Install gcloud cli and docker
 
@@ -78,9 +80,40 @@ image storage and *Cloud Run* for managed, serverless runtime environment.
         - Add SQL connection (Under Connections section)
         - Add service account (Under security section)
 
-## Set up Jupyterlab:
-- Make sure `kubectl` and `helm` are installed.
-- 
+## Jupyterlab setup:
+
+1. Build and push image
+```
+cd gcp/src/experiments/jupyter/ && /
+docker build -t us-central1-docker.pkg.dev/data-science-362714/data-science/jupyterlab:1.0 . && /
+docker push us-central1-docker.pkg.dev/data-science-362714/data-science/jupyterlab:1.0
+```
+
+2. Deploy image to GKE
+```
+kubectl apply -f deployment.yaml && /
+kubectl apply -f service.yaml
+```
+
+3. Port forward the UI to local host
+
+Grab the pod name:
+```
+kubectl get pods -n <name-space>
+```
+
+Port forward
+```
+kubectl port-forward <pod-name> 8888:8888 -n <name-space>
+```
+
+4. Go to [http://localhost:8888/lab](http://localhost:8888/lab?)
+
+5. If you are prompted with a token:
+```
+pip install kubernetes & /
+python token.py
+```
 
 ## How to track experiments:
 

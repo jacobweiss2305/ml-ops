@@ -1,0 +1,42 @@
+apiVersion: "apps/v1"
+kind: "Deployment"
+metadata:
+  name: "jupyterlab"
+  namespace: "jlab"
+  labels:
+    app: "jupyterlab"
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: "jupyterlab"
+  template:
+    metadata:
+      labels:
+        app: "jupyterlab"
+    spec:
+      containers:
+      - name: "jupyterlab-sha256-1"
+        image: "us-central1-docker.pkg.dev/data-science-362714/data-science/jupyterlab@sha256:c4eb7ad9069b73718e52574a94c8b2960237c5b508089cb61e9bf04a3d310c47"
+---
+apiVersion: "autoscaling/v2"
+kind: "HorizontalPodAutoscaler"
+metadata:
+  name: "jupyterlab-hpa-etya"
+  namespace: "jlab"
+  labels:
+    app: "jupyterlab"
+spec:
+  scaleTargetRef:
+    kind: "Deployment"
+    name: "jupyterlab"
+    apiVersion: "apps/v1"
+  minReplicas: 1
+  maxReplicas: 5
+  metrics:
+  - type: "Resource"
+    resource:
+      name: "cpu"
+      target:
+        type: "Utilization"
+        averageUtilization: 80
