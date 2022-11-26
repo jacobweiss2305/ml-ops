@@ -32,7 +32,16 @@ kill-ns:
 	kubectl delete namespace $(ns)
 
 .PHONY:
-jup-launch:
-	kubectl create namespace $(ns) --dry-run=client -o yaml | kubectl apply -f - && \
+start-jlab:
+	kubectl create namespace jlab --dry-run=client -o yaml | kubectl apply -f - && \
 	kubectl apply -f experiments/jupyter/deployment.yaml && \
-	kubectl get pods -n $(ns)
+	sleep 5 && \
+	kubectl get pods -n jlab
+
+.PHONY:
+open-jlab:
+	kubectl port-forward $(pod-name) 8888:8888 -n jlab
+
+.PHONY:
+exit-jlab:
+	kubectl delete namespaces jlab
