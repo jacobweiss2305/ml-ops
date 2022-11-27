@@ -2,4 +2,4 @@
 
 An open-source recipe for running production ML workloads.
 
-Head over the the GCP folder for getting started instructions.
+Head over to the GCP folder for getting started instructions.
